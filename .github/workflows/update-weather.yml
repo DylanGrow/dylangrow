@@ -36,11 +36,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          TEMP=${{ steps.fetch.outputs.temp }}
-          WIND=${{ steps.fetch.outputs.wind }}
-          HUM=${{ steps.fetch.outputs.hum }}
-          COND=${{ steps.fetch.outputs.cond }}
-          UPDATED=${{ steps.fetch.outputs.updated }}
+          TEMP="${{ steps.fetch.outputs.temp }}"
+          WIND="${{ steps.fetch.outputs.wind }}"
+          HUM="${{ steps.fetch.outputs.hum }}"
+          COND="${{ steps.fetch.outputs.cond }}"
+          UPDATED="${{ steps.fetch.outputs.updated }}"
           # Use awk to replace between markers
           awk -v temp="$TEMP" -v wind="$WIND" -v hum="$HUM" -v cond="$COND" -v updated="$UPDATED" \
             'BEGIN{start=0} \
