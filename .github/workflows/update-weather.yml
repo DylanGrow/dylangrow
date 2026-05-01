@@ -1,82 +1,62 @@
 name: Update Weather (Open-Meteo)
+
 on:
   schedule:
-    - cron: '0 */3 * * *' # every 3 hours
-  workflow_dispatch:
-permissions:
-  contents: write
+    - cron: '0 * * * *' # Runs every hour
+  workflow_dispatch: # Allows manual trigger
+
 jobs:
   update-weather:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Fetch weather (Open-Meteo)
+      - name: Fetch Weather Data
         id: fetch
         run: |
-          set -euo pipefail
-
-          # Raleigh, NC coordinates
-          LAT="35.7796"
-          LON="-78.6382"
-
-          # Fetch current weather and hourly humidity (timezone = America/New_York)
-          JSON=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current_weather=true&hourly=relativehumidity_2m&timezone=America%2FNew_York")
-
-          # Parse values with jq (fail if missing)
-          TEMP_C=$(echo "$JSON" | jq -r '.current_weather.temperature // empty')
-          WIND_MS=$(echo "$JSON" | jq -r '.current_weather.windspeed // empty')
-          HUM=$(echo "$JSON" | jq -r '.hourly.relativehumidity_2m[0] // "N/A"')
-
-          if [ -z "$TEMP_C" ] || [ -z "$WIND_MS" ]; then
-            echo "Failed to parse weather JSON:"
-            echo "$JSON"
-            exit 1
-          fi
-
-          # Convert to Fahrenheit and mph
-          TEMP_F=$(awk "BEGIN{printf \"%.0f\",($TEMP_C * 9/5) + 32}")
-          WIND_MPH=$(awk "BEGIN{printf \"%.1f\",$WIND_MS * 2.23694}")
-
-          COND="Clear" # Open-Meteo's simple current_weather doesn't include text; you can improve by mapping weathercode.
-          UPDATED="$(date -u +"%Y-%m-%d %H:%M UTC")"
-
-          # Export outputs (use GITHUB_OUTPUT)
-          echo "temp=$TEMP_F" >> "$GITHUB_OUTPUT"
-          echo "wind=$WIND_MPH" >> "$GITHUB_OUTPUT"
-          echo "hum=$HUM" >> "$GITHUB_OUTPUT"
-          echo "cond=$COND" >> "$GITHUB_OUTPUT"
-          echo "updated=$UPDATED" >> "$GITHUB_OUTPUT"
+          # Fetching data from Open-Meteo for Raleigh, NC
+          RESPONSE=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=35.7721&longitude=-78.6386&current_weather=true")
+          TEMP=$(echo $RESPONSE | jq '.current_weather.temperature')
+          WIND=$(echo $RESPONSE | jq '.current_weather.windspeed')
+          CODE=$(echo $RESPONSE | jq '.current_weather.weathercode')
+          # Standardizing the timestamp
+          UPDATED=$(date -u +"%Y-%m-%d %H:%M UTC")
+          
+          echo "temp=$TEMP" >> $GITHUB_OUTPUT
+          echo "wind=$WIND" >> $GITHUB_OUTPUT
+          echo "cond=$CODE" >> $GITHUB_OUTPUT
+          echo "updated=$UPDATED" >> $GITHUB_OUTPUT
 
       - name: Replace weather block in README
+        env:
+          TEMP: ${{ steps.fetch.outputs.temp }}
+          WIND: ${{ steps.fetch.outputs.wind }}
+          COND: ${{ steps.fetch.outputs.cond }}
+          UPDATED: ${{ steps.fetch.outputs.updated }}
         run: |
-          set -euo pipefail
-
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          TEMP="${{ steps.fetch.outputs.temp }}"
-          WIND="${{ steps.fetch.outputs.wind }}"
-          HUM="${{ steps.fetch.outputs.hum }}"
-          COND="${{ steps.fetch.outputs.cond }}"
-          UPDATED="${{ steps.fetch.outputs.updated }}"
-
-          # Ensure README.md.template exists
-          if [ ! -f README.md.template ]; then
-            echo "README.md.template not found. Create README.md.template with <!-- WEATHER:START --> and <!-- WEATHER:END --> markers."
-            exit 1
-          fi
-
-          # Replace the weather block between markers in the template and write README.md
-          awk -v temp="$TEMP" -v wind="$WIND" -v hum="$HUM" -v cond="$COND" -v updated="$UPDATED" \
-            'BEGIN{printing=1}
-             /<!-- WEATHER:START -->/ { print; print "### Current weather — Raleigh, NC (Eastern USA)\n"; print "- Temperature: **" temp "°F**"; print "- Condition: **" cond "**"; print "- Wind: **" wind " mph**"; print "- Humidity: **" hum "%**"; print "- Updated: " updated "\n"; printing=0; next }
-             /<!-- WEATHER:END -->/ { printing=1; print; next }
-             { if (printing==1) print }' README.md.template > README.md
-
+          
+          # Use awk to replace content between markers
+          # Environment variables are accessed via '$NAME' to ensure safe shell parsing
+          awk -v temp="$TEMP" -v wind="$WIND" -v cond="$COND" -v updated="$UPDATED" \
+            'BEGIN {show=1} \
+            // {
+                print; 
+                print "### Current weather — Raleigh, NC (Eastern USA)";
+                print "";
+                print "- Temperature: **" temp "°F**";
+                print "- Condition Code: **" cond "**";
+                print "- Wind Speed: **" wind " mph**";
+                print "";
+                print "*Last updated: " updated "*";
+                show=0; 
+                next
+            } \
+            // {show=1; print; next} \
+            show' README.md.template > README.md
+          
           git add README.md
-          if git commit -m "chore(readme): update weather"; then
-            git push
-          else
-            echo "No changes to commit."
-          fi
+          git commit -m "chore(readme): update weather" || echo "no changes to commit"
+          git push
