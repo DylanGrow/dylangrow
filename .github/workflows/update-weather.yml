@@ -18,15 +18,15 @@ jobs:
       - name: Fetch Weather Data
         id: weather
         run: |
-          # Fetching data for Raleigh, NC
-         RESPONSE=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=35.1085&longitude=-77.0441&current_weather=true&hourly=relativehumidity_2m&temperature_unit=fahrenheit&windspeed_unit=mph")
+          # Fetching data for New Bern, NC (Fahrenheit & MPH)
+          RESPONSE=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=35.1085&longitude=-77.0441&current_weather=true&hourly=relativehumidity_2m&temperature_unit=fahrenheit&windspeed_unit=mph")
           
           # Extracting specific data points
           TEMP=$(echo $RESPONSE | jq '.current_weather.temperature')
           WIND=$(echo $RESPONSE | jq '.current_weather.windspeed')
           CODE=$(echo $RESPONSE | jq '.current_weather.weathercode')
           HUM=$(echo $RESPONSE | jq '.hourly.relativehumidity_2m[0]')
-          UPDATED=$(date -u +"%Y-%m-%d %H:%M UTC")
+          UPDATED=$(date -u +"%Y-%m-%d %I:%M %p UTC")
           
           # Mapping WMO Weather Codes to text descriptions
           if [ "$CODE" == "0" ]; then COND="Clear sky ☀️"
