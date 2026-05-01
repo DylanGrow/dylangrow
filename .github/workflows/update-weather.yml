@@ -43,9 +43,9 @@ jobs:
           UPDATED=${{ steps.fetch.outputs.updated }}
           # Use awk to replace between markers
           awk -v temp="$TEMP" -v wind="$WIND" -v hum="$HUM" -v cond="$COND" -v updated="$UPDATED" \
-            'BEGIN{start=0} 
-             /<!-- WEATHER:START -->/{print; print "### Current weather — Raleigh, NC (Eastern USA)\n"; print "- Temperature: **" temp "°F**"; print "- Condition: **" cond "**"; print "- Wind: **" wind " mph**"; print "- Humidity: **" hum "%**"; print "- Updated: " updated "\n"; start=1; next} 
-             /<!-- WEATHER:END -->/{start=0; print; next} 
+            'BEGIN{start=0} \
+             /<!-- WEATHER:START -->/{print; print "### Current weather — Raleigh, NC (Eastern USA)\n"; print "- Temperature: **" temp "°F**"; print "- Condition: **" cond "**"; print "- Wind: **" wind " mph**"; print "- Humidity: **" hum "%**"; print "- Updated: **" updated "**"; start=1; next} \
+             /<!-- WEATHER:END -->/{start=0; print; next} \
              { if (start==0) print }' README.md.template > README.md
           git add README.md
           git commit -m "chore(readme): update weather" || echo "no changes to commit"
