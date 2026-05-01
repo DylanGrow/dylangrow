@@ -1,4 +1,4 @@
-name: Update Weather (Open-Meteo)
+name: Update Weather
 
 on:
   schedule:
@@ -8,44 +8,33 @@ on:
 jobs:
   update-weather:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
     steps:
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Fetch and Prepare Weather Data
+      - name: Get Weather
+        id: weather
         run: |
-          # 1. Fetch from API
-          RESPONSE=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=35.7721&longitude=-78.6386&current_weather=true&hourly=relativehumidity_2m")
-          
-          # 2. Extract values and create a clean JSON file
-          # This avoids all shell quoting issues
-          jq -n \
-            --arg temp "$(echo $RESPONSE | jq '.current_weather.temperature')" \
-            --arg wind "$(echo $RESPONSE | jq '.current_weather.windspeed')" \
-            --arg code "$(echo $RESPONSE | jq '.current_weather.weathercode')" \
-            --arg hum "$(echo $RESPONSE | jq '.hourly.relativehumidity_2m[0]')" \
-            --arg updated "$(date -u +"%Y-%m-%d %H:%M UTC")" \
-            '{temp: $temp, wind: $wind, code: $code, hum: $hum, updated: $updated}' > weather_data.json
+          # Fetch data for Raleigh
+          DATA=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=35.7721&longitude=-78.6386&current_weather=true")
+          TEMP=$(echo $DATA | jq '.current_weather.temperature')
+          # Create a simple, clean string
+          echo "display=Current Temperature in Raleigh: **${TEMP}°F**" >> $GITHUB_OUTPUT
 
-      - name: Update README
+      - name: Build README
+        env:
+          INFO: ${{ steps.weather.outputs.display }}
+        run: |
+          # Read the template, replace the tag, and save as README.md
+          sed "s||$INFO|g" README.md.template > README.md
+
+      - name: Push Changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # 3. Read from the JSON file to build our text block
-          # This method is immune to the "12:50: command not found" error
-          TEMP=$(jq -r .temp weather_data.json)
-          WIND=$(jq -r .wind weather_data.json)
-          CODE=$(jq -r .code weather_data.json)
-          HUM=$(jq -r .hum weather_data.json)
-          UPDATED=$(jq -r .updated weather_data.json)
-
-          WEATHER_BLOCK="### Current weather — Raleigh, NC (Eastern USA)\n\n- Temperature: **${TEMP}°F**\n- Condition Code: **${CODE}**\n- Wind Speed: **${WIND} mph**\n- Humidity: **${HUM}%**\n\n*Last updated: ${UPDATED}*"
-
-          # 4. Use sed to replace the content between markers
-          # We use a perl-style regex to handle the multi-line replacement reliably
-          perl -0777 -i -pe "s/().*?()/\$1\n$WEATHER_BLOCK\n\$2/sg" README.md
-
           git add README.md
-          git commit -m "chore(readme): update weather" || echo "no changes to commit"
+          git commit -m "Update weather" || exit 0
           git push
