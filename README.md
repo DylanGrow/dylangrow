@@ -5,7 +5,23 @@
   Based in New Bern, NC, I specialize in enterprise networking, virtualization, and modern web workflows. I'm passionate about building robust home labs and solving complex infrastructure puzzles.
 </p>
 
+<p align="center">
+  <a href="https://www.linkedin.com/in/dgrow27/" target="_blank">
+    <img src="https://img.shields.io/badge/LinkedIn-101820?style=for-the-badge&logo=linkedin&logoColor=FFB612" alt="LinkedIn" />
+  </a>
+  <a href="https://github.com/DylanGrow" target="_blank">
+    <img src="https://img.shields.io/github/followers/DylanGrow?label=Followers&style=for-the-badge&color=101820&logoColor=FFB612" alt="GitHub followers" />
+  </a>
+</p>
+
 ---
+
+### 📊 Infrastructure Activity
+
+<p align="center">
+  <img src="https://github-readme-stats.vercel.app/api?username=DylanGrow&show_icons=true&title_color=FFB612&icon_color=FFB612&text_color=ffffff&bg_color=101820&hide_border=true" alt="Dylan's GitHub Stats" />
+  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=DylanGrow&layout=compact&title_color=FFB612&text_color=ffffff&bg_color=101820&hide_border=true" alt="Top Languages" />
+</p>
 
 ### 🛠️ Technical Arsenal
 
@@ -19,6 +35,11 @@
   <img src="https://img.shields.io/badge/Cloudflare_Workers-101820?style=for-the-badge&logo=cloudflare&logoColor=FFB612" alt="Cloudflare" />
   <img src="https://img.shields.io/badge/GitHub_Pages-101820?style=for-the-badge&logo=github&logoColor=FFB612" alt="GitHub Pages" />
 </p>
+
+### 🎯 Current Objectives
+* Architecting scalable and secure network environments.
+* Automating routine infrastructure deployments and monitoring.
+* Seeking roles in **IT Systems Analysis**, **Network Administration**, or **Tier II/III Technical Support**.
 
 ### 📜 Certifications
 * **CompTIA A+** (Certified)
@@ -34,14 +55,14 @@
 ---
 
 ### 🌤️ Current Operations Environment (New Bern, NC)
-- **Temperature:** 11.7°F
+- **Temperature:** 58.2°F
 - **Conditions:** Partly cloudy ⛅
-- **Wind:** 10.4 mph
-- **Humidity:** 54%
-- *Last Updated: 2026-05-01 13:09 UTC*
+- **Wind:** 7.2 mph
+- **Humidity:** 81%
+- *Last Updated: 2026-05-01 01:21 PM UTC*
 
 ---
 
 <p align="center">
-  <a href="https://github.com/DylanGrow"><img src="https://img.shields.io/github/followers/DylanGrow?label=Followers&style=social" alt="GitHub followers"></a>
+  <img src="https://visitor-badge.laobi.icu/badge?page_id=DylanGrow.DylanGrow" alt="Visitors" />
 </p>
