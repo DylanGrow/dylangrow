@@ -2,8 +2,8 @@ name: Update Weather (Open-Meteo)
 
 on:
   schedule:
-    - cron: '0 * * * *' # Runs every hour
-  workflow_dispatch: # Allows manual trigger
+    - cron: '0 * * * *'
+  workflow_dispatch:
 
 jobs:
   update-weather:
@@ -15,47 +15,58 @@ jobs:
       - name: Fetch Weather Data
         id: fetch
         run: |
-          # Fetching data from Open-Meteo for Raleigh, NC
-          RESPONSE=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=35.7721&longitude=-78.6386&current_weather=true")
+          # Fetching data for Raleigh, NC
+          RESPONSE=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=35.7721&longitude=-78.6386&current_weather=true&hourly=relativehumidity_2m")
+          
+          # Extract data points
           TEMP=$(echo $RESPONSE | jq '.current_weather.temperature')
           WIND=$(echo $RESPONSE | jq '.current_weather.windspeed')
           CODE=$(echo $RESPONSE | jq '.current_weather.weathercode')
-          # Standardizing the timestamp
+          HUM=$(echo $RESPONSE | jq '.hourly.relativehumidity_2m[0]')
           UPDATED=$(date -u +"%Y-%m-%d %H:%M UTC")
           
+          # Export to GITHUB_OUTPUT
           echo "temp=$TEMP" >> $GITHUB_OUTPUT
           echo "wind=$WIND" >> $GITHUB_OUTPUT
           echo "cond=$CODE" >> $GITHUB_OUTPUT
+          echo "hum=$HUM" >> $GITHUB_OUTPUT
           echo "updated=$UPDATED" >> $GITHUB_OUTPUT
 
       - name: Replace weather block in README
         env:
+          # Mapping outputs to env vars prevents shell injection errors
           TEMP: ${{ steps.fetch.outputs.temp }}
           WIND: ${{ steps.fetch.outputs.wind }}
           COND: ${{ steps.fetch.outputs.cond }}
+          HUM: ${{ steps.fetch.outputs.hum }}
           UPDATED: ${{ steps.fetch.outputs.updated }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Use awk to replace content between markers
-          # Environment variables are accessed via '$NAME' to ensure safe shell parsing
-          awk -v temp="$TEMP" -v wind="$WIND" -v cond="$COND" -v updated="$UPDATED" \
-            'BEGIN {show=1} \
+          # Use awk with -v to safely pass variables into the script
+          awk -v temp="$TEMP" -v wind="$WIND" -v cond="$COND" -v hum="$HUM" -v updated="$UPDATED" '
+            BEGIN { skip=0 }
             // {
-                print; 
-                print "### Current weather — Raleigh, NC (Eastern USA)";
-                print "";
-                print "- Temperature: **" temp "°F**";
-                print "- Condition Code: **" cond "**";
-                print "- Wind Speed: **" wind " mph**";
-                print "";
-                print "*Last updated: " updated "*";
-                show=0; 
-                next
-            } \
-            // {show=1; print; next} \
-            show' README.md.template > README.md
+              print
+              print "### Current weather — Raleigh, NC (Eastern USA)"
+              print ""
+              print "- Temperature: **" temp "°F**"
+              print "- Condition Code: **" cond "**"
+              print "- Wind: **" wind " mph**"
+              print "- Humidity: **" hum "%**"
+              print ""
+              print "*Last updated: " updated "*"
+              skip=1
+              next
+            }
+            // {
+              skip=0
+              print
+              next
+            }
+            !skip { print }
+          ' README.md.template > README.md
           
           git add README.md
           git commit -m "chore(readme): update weather" || echo "no changes to commit"
