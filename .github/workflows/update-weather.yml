@@ -19,7 +19,7 @@ jobs:
         id: weather
         run: |
           # Fetching data for Raleigh, NC
-          RESPONSE=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=35.7721&longitude=-78.6386&current_weather=true&hourly=relativehumidity_2m")
+         RESPONSE=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=35.1085&longitude=-77.0441&current_weather=true&hourly=relativehumidity_2m&temperature_unit=fahrenheit&windspeed_unit=mph")
           
           # Extracting specific data points
           TEMP=$(echo $RESPONSE | jq '.current_weather.temperature')
