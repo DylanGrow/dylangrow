@@ -1,6 +1,6 @@
 <h1><img src="https://emojis.slackmojis.com/emojis/images/1531849430/4246/blob-sunglasses.gif?1531849430" width="30"/> Hey! Nice to see you.</h1>
 
-<p>Welcome to my page! <br/> I'm Dylan, front-end developer from <img src="https://cdn-icons-png.flaticon.com/512/197/197560.png" width="13"/> <b>Lorient, France</b>, currently living in <img src="https://cdn-icons-png.flaticon.com/512/197/197564.png" width="13"/> <b>Eastern USA</b>. </p>
+<p>Welcome to my page! <br/> I'm Dylan, front-end developer from <img src="https://cdn-icons-png.flaticon.com/512/197/197484.png" width="13"/> <b>North Carolina, USA</b>, currently living in <img src="https://cdn-icons-png.flaticon.com/512/197/197484.png" width="13"/> <b>Eastern USA</b>. </p>
 
 <h3>Things I code with</h3>
 <p>
@@ -23,8 +23,19 @@
 - 🔭 Working on: modern, accessible UI and responsive layouts<br/>
 - 🌱 Learning: advanced CSS and design systems<br/>
 - 💬 Ask me about: CSS, HTML semantics, and frontend tooling<br/>
-- 🗣 Languages: <img alt="English" src="https://img.shields.io/badge/-English-green?style=flat-square" />
+- 🗣 Languages: <img alt="English" src="https://img.shields.io/badge/-English-green?style=flat-square" /><br/>
+- ✅ Certifications: <img alt="CompTIA A+" src="https://img.shields.io/badge/-CompTIA_A%2B-blue?style=flat-square" /> <img alt="OSHA 10" src="https://img.shields.io/badge/-OSHA_10-orange?style=flat-square" />
 </p>
+
+<!-- WEATHER:START -->
+### Current weather — Raleigh, NC (Eastern USA)
+
+- Temperature: **{{TEMP}}°F**
+- Condition: **{{COND}}**
+- Wind: **{{WIND}} mph**
+- Humidity: **{{HUM}}%**
+- Updated: {{UPDATED}}
+<!-- WEATHER:END -->
 
 <p align="center">
   <img alt="Visitors" src="https://visitor-badge.laobi.icu/badge?page_id=DylanGrow.DylanGrow" />
@@ -34,7 +45,7 @@
   <img alt="Last commit" src="https://img.shields.io/github/last-commit/DylanGrow/DylanGrow" />
   <img alt="License" src="https://img.shields.io/badge/license-MIT-lightgrey" />
   <img alt="Tech stack" src="https://img.shields.io/badge/tech-HTML%20|%20CSS%20|%20JavaScript-ff69b4" />
-  <img alt="Website" src="https://img.shields.io/badge/website-MySite-blue" />
+  <a href="MY_WEBSITE_URL" target="_blank"><img alt="Website" src="https://img.shields.io/badge/website-MySite-blue" /></a>
 </p>
 
 <h3>Where to find me</h3>
