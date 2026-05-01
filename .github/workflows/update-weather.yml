@@ -12,29 +12,61 @@ jobs:
       contents: write
     
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Get Weather
+      - name: Fetch Weather Data
         id: weather
         run: |
-          # Fetch data for Raleigh
-          DATA=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=35.7721&longitude=-78.6386&current_weather=true")
-          TEMP=$(echo $DATA | jq '.current_weather.temperature')
-          # Create a simple, clean string
-          echo "display=Current Temperature in Raleigh: **${TEMP}°F**" >> $GITHUB_OUTPUT
+          # Fetching data for Raleigh, NC
+          RESPONSE=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=35.7721&longitude=-78.6386&current_weather=true&hourly=relativehumidity_2m")
+          
+          # Extracting specific data points
+          TEMP=$(echo $RESPONSE | jq '.current_weather.temperature')
+          WIND=$(echo $RESPONSE | jq '.current_weather.windspeed')
+          CODE=$(echo $RESPONSE | jq '.current_weather.weathercode')
+          HUM=$(echo $RESPONSE | jq '.hourly.relativehumidity_2m[0]')
+          UPDATED=$(date -u +"%Y-%m-%d %H:%M UTC")
+          
+          # Mapping WMO Weather Codes to text descriptions
+          if [ "$CODE" == "0" ]; then COND="Clear sky ☀️"
+          elif [ "$CODE" == "1" ] || [ "$CODE" == "2" ] || [ "$CODE" == "3" ]; then COND="Partly cloudy ⛅"
+          elif [[ "$CODE" =~ ^(45|48)$ ]]; then COND="Fog 🌫️"
+          elif [[ "$CODE" =~ ^(51|53|55|61|63|65|80|81|82)$ ]]; then COND="Rain 🌧️"
+          elif [[ "$CODE" =~ ^(71|73|75|85|86)$ ]]; then COND="Snow ❄️"
+          elif [[ "$CODE" =~ ^(95|96|99)$ ]]; then COND="Thunderstorm ⚡"
+          else COND="Unknown"
+          fi
+          
+          # Safely pass data to the next step
+          echo "temp=$TEMP" >> $GITHUB_OUTPUT
+          echo "wind=$WIND" >> $GITHUB_OUTPUT
+          echo "cond=$COND" >> $GITHUB_OUTPUT
+          echo "hum=$HUM" >> $GITHUB_OUTPUT
+          echo "updated=$UPDATED" >> $GITHUB_OUTPUT
 
-      - name: Build README
+      - name: Build README from Template
         env:
-          INFO: ${{ steps.weather.outputs.display }}
+          TEMP: ${{ steps.weather.outputs.temp }}
+          WIND: ${{ steps.weather.outputs.wind }}
+          COND: ${{ steps.weather.outputs.cond }}
+          HUM: ${{ steps.weather.outputs.hum }}
+          UPDATED: ${{ steps.weather.outputs.updated }}
         run: |
-          # Read the template, replace the tag, and save as README.md
-          sed "s||$INFO|g" README.md.template > README.md
+          # Read the template, swap placeholders with live data, and save as the real README.md
+          sed -e "s|{{TEMP}}|$TEMP|g" \
+              -e "s|{{COND}}|$COND|g" \
+              -e "s|{{WIND}}|$WIND|g" \
+              -e "s|{{HUM}}|$HUM|g" \
+              -e "s|{{UPDATED}}|$UPDATED|g" \
+              README.md.template > README.md
 
-      - name: Push Changes
+      - name: Commit and Push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add README.md
-          git commit -m "Update weather" || exit 0
+          
+          # If the weather hasn't changed, this safely exits without crashing
+          git commit -m "chore(readme): update weather" || exit 0
           git push
