@@ -1,4 +1,4 @@
-name: Update Weather
+name: Update Weather (Open-Meteo)
 on:
   schedule:
     - cron: '0 */3 * * *' # every 3 hours
@@ -10,13 +10,43 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run weather generator
-        uses: huantt/weather-forecast@v1.0.5
-        with:
-          city: "Raleigh"
-          country: "US"
-          days: 1
-          units: "metric"
-          weather-api-key: ${{ secrets.WEATHER_API_KEY }}
-          template-file: 'README.md.template'
-          out-file: 'README.md'
+      - name: Fetch weather (Open-Meteo)
+        id: fetch
+        run: |
+          # Raleigh, NC coordinates
+          LAT=35.7796
+          LON=-78.6382
+          # Fetch current weather (Open-Meteo)
+          JSON=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current_weather=true&hourly=relativehumidity_2m&timezone=America%2FNew_York")
+          TEMP_C=$(echo "$JSON" | jq -r '.current_weather.temperature')
+          WIND_MS=$(echo "$JSON" | jq -r '.current_weather.windspeed')
+          # Convert to Fahrenheit and mph
+          TEMP_F=$(awk "BEGIN{printf \"%.0f\",($TEMP_C * 9/5) + 32}")
+          WIND_MPH=$(awk "BEGIN{printf \"%.1f\",$WIND_MS * 2.23694}")
+          # Try to get humidity from hourly arrays (closest hour)
+          HUM=$(echo "$JSON" | jq -r '.hourly.relativehumidity_2m[0] // "N/A"')
+          COND="Clear"
+          UPDATED=$(date -u +"%Y-%m-%d %H:%M UTC")
+          echo "::set-output name=temp::$TEMP_F"
+          echo "::set-output name=wind::$WIND_MPH"
+          echo "::set-output name=hum::$HUM"
+          echo "::set-output name=cond::$COND"
+          echo "::set-output name=updated::$UPDATED"
+      - name: Replace weather block in README
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          TEMP=${{ steps.fetch.outputs.temp }}
+          WIND=${{ steps.fetch.outputs.wind }}
+          HUM=${{ steps.fetch.outputs.hum }}
+          COND=${{ steps.fetch.outputs.cond }}
+          UPDATED=${{ steps.fetch.outputs.updated }}
+          # Use awk to replace between markers
+          awk -v temp="$TEMP" -v wind="$WIND" -v hum="$HUM" -v cond="$COND" -v updated="$UPDATED" \
+            'BEGIN{start=0} 
+             /<!-- WEATHER:START -->/{print; print "### Current weather — Raleigh, NC (Eastern USA)\n"; print "- Temperature: **" temp "°F**"; print "- Condition: **" cond "**"; print "- Wind: **" wind " mph**"; print "- Humidity: **" hum "%**"; print "- Updated: " updated "\n"; start=1; next} 
+             /<!-- WEATHER:END -->/{start=0; print; next} 
+             { if (start==0) print }' README.md.template > README.md
+          git add README.md
+          git commit -m "chore(readme): update weather" || echo "no changes to commit"
+          git push
