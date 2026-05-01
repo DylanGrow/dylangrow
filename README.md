@@ -1,16 +1,17 @@
-## Hi there 👋
+### Hi — I'm Dylan 👋
 
-<!--
-**DylanGrow/dylangrow** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+![Visitors](https://visitor-badge.laobi.icu/badge?page_id=DylanGrow.DylanGrow)
 
-Here are some ideas to get you started:
+A front-end developer focused on HTML, CSS, and JavaScript.  
+- 🔭 Working on: modern, accessible UI and responsive layouts  
+- 🌱 Learning: advanced CSS and design systems  
+- 💬 Ask me about: CSS, HTML semantics, and frontend tooling  
+- 📫 Reach me: https://github.com/DylanGrow
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+<p align="center">
+  <img alt="Visitors" src="https://visitor-badge.laobi.icu/badge?page_id=DylanGrow.DylanGrow" />
+  <img alt="GitHub followers" src="https://img.shields.io/github/followers/DylanGrow?label=Follow&style=social" />
+  <img alt="Top languages" src="https://img.shields.io/github/languages/top/DylanGrow/DylanGrow?color=yellow" />
+  <img alt="Repo stars" src="https://img.shields.io/github/stars/DylanGrow?style=social" />
+  <img alt="Website" src="https://img.shields.io/badge/website-GitHub-blue" />
+</p>
