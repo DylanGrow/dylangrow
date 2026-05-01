@@ -19,8 +19,7 @@
 ### 📊 Infrastructure Activity
 
 <p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=DylanGrow&show_icons=true&title_color=FFB612&icon_color=FFB612&text_color=ffffff&bg_color=101820&hide_border=true" alt="Dylan's GitHub Stats" />
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=DylanGrow&layout=compact&title_color=FFB612&text_color=ffffff&bg_color=101820&hide_border=true" alt="Top Languages" />
+  <img src="https://github-readme-activity-graph.vercel.app/graph?username=DylanGrow&bg_color=101820&color=ffffff&line=FFB612&point=ffffff&hide_border=true" alt="Dylan's Activity Graph" />
 </p>
 
 ### 🛠️ Technical Arsenal
@@ -57,9 +56,9 @@
 ### 🌤️ Current Operations Environment (New Bern, NC)
 - **Temperature:** 58.2°F
 - **Conditions:** Partly cloudy ⛅
-- **Wind:** 7.2 mph
+- **Wind:** 8.7 mph
 - **Humidity:** 81%
-- *Last Updated: 2026-05-01 01:21 PM UTC*
+- *Last Updated: 2026-05-01 01:27 PM UTC*
 
 ---
 
