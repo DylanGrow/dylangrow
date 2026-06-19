@@ -54,11 +54,11 @@
 ---
 
 ### 🌤️ Current Operations Environment (New Bern, NC)
-- **Temperature:** 94.5°F
-- **Conditions:** Clear sky ☀️
-- **Wind:** 14.7 mph
-- **Humidity:** 79%
-- *Last Updated: 2026-06-18 10:53 PM UTC*
+- **Temperature:** 88.1°F
+- **Conditions:** Thunderstorm ⚡
+- **Wind:** 13.1 mph
+- **Humidity:** 62%
+- *Last Updated: 2026-06-19 12:21 AM UTC*
 
 ---
 
